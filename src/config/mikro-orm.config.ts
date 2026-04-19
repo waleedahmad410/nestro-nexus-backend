@@ -1,28 +1,33 @@
-import 'dotenv/config';
-
-import { defineConfig } from '@mikro-orm/postgresql';
 import { Migrator } from '@mikro-orm/migrations';
 import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
+import { defineConfig, PostgreSqlDriver } from '@mikro-orm/postgresql';
+import { ConfigService } from '@nestjs/config';
 
 import { entities } from '../database/entities';
+import { EnvironmentVariables } from './env.validation';
 
-export default defineConfig({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT || 5432),
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-  dbName: process.env.DB_NAME || 'nestro_nexus',
+export const createMikroOrmConfig = (
+  configService: ConfigService<EnvironmentVariables, true>,
+) =>
+  defineConfig({
+    driver: PostgreSqlDriver,
 
-  entities,
+    host: configService.getOrThrow<string>('DB_HOST'),
+    port: configService.getOrThrow<number>('DB_PORT'),
+    user: configService.getOrThrow<string>('DB_USER'),
+    password: configService.getOrThrow<string>('DB_PASSWORD'),
+    dbName: configService.getOrThrow<string>('DB_NAME'),
 
-  metadataProvider: ReflectMetadataProvider,
+    entities,
 
-  extensions: [Migrator],
+    metadataProvider: ReflectMetadataProvider,
 
-  migrations: {
-    path: './dist/database/migrations',
-    pathTs: './src/database/migrations',
-  },
+    extensions: [Migrator],
 
-  debug: process.env.NODE_ENV !== 'production',
-});
+    migrations: {
+      path: './dist/database/migrations',
+      pathTs: './src/database/migrations',
+    },
+
+    debug: configService.getOrThrow<string>('NODE_ENV') !== 'production',
+  });

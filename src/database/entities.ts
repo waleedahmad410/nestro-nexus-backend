@@ -1,5 +1,3 @@
 import { Brand } from '../modules/brands/entities/brand.entity';
 
-export const entities = [
-  Brand,
-];
+export const entities = [Brand];

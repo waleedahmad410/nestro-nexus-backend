@@ -3,6 +3,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@mikro-orm/nestjs';
@@ -22,82 +23,101 @@ export class BrandsService {
   ) {}
 
   async create(createBrandDto: CreateBrandDto): Promise<Brand> {
-    const existingBrand = await this.brandRepository.findOne({
-      slug: createBrandDto.slug,
-    });
+    try {
+      await this.ensureSlugIsUnique(createBrandDto.slug);
+
+      const brand = this.brandRepository.create({
+        name: createBrandDto.name,
+        slug: createBrandDto.slug,
+        isActive: createBrandDto.isActive ?? true,
+      });
+
+      this.em.persist(brand);
+      await this.em.flush();
+
+      return brand;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findAll(): Promise<Brand[]> {
+    try {
+      return await this.brandRepository.findAll({
+        orderBy: {
+          createdAt: 'desc',
+        },
+      });
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async findOne(id: string): Promise<Brand> {
+    try {
+      const brand = await this.brandRepository.findOne({ id });
+
+      if (!brand) {
+        throw new NotFoundException('Brand not found');
+      }
+
+      return brand;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async update(id: string, updateBrandDto: UpdateBrandDto): Promise<Brand> {
+    try {
+      const brand = await this.findOne(id);
+
+      if (updateBrandDto.slug && updateBrandDto.slug !== brand.slug) {
+        await this.ensureSlugIsUnique(updateBrandDto.slug);
+      }
+
+      this.brandRepository.assign(brand, updateBrandDto);
+
+      await this.em.flush();
+
+      return brand;
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  async remove(id: string): Promise<{ message: string }> {
+    try {
+      const brand = await this.findOne(id);
+
+      // Recommended for ERP: soft delete instead of hard delete
+      brand.isActive = false;
+
+      await this.em.flush();
+
+      return {
+        message: 'Brand deleted successfully',
+      };
+    } catch (error) {
+      this.handleError(error);
+    }
+  }
+
+  private async ensureSlugIsUnique(slug: string): Promise<void> {
+    const existingBrand = await this.brandRepository.findOne({ slug });
 
     if (existingBrand) {
       throw new ConflictException('Brand slug already exists');
     }
-
-    const brand = this.brandRepository.create({
-      name: createBrandDto.name,
-      slug: createBrandDto.slug,
-      isActive: createBrandDto.isActive ?? true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    await this.em.persist(brand);
-
-    return brand;
   }
 
-  async findAll(): Promise<Brand[]> {
-    return this.brandRepository.findAll({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
-  }
-
-  async findOne(id: string): Promise<Brand> {
-    const brand = await this.brandRepository.findOne({ id });
-
-    if (!brand) {
-      throw new NotFoundException('Brand not found');
+  private handleError(error: unknown): never {
+    if (
+      error instanceof ConflictException ||
+      error instanceof NotFoundException
+    ) {
+      throw error;
     }
 
-    return brand;
-  }
-
-  async update(id: string, updateBrandDto: UpdateBrandDto): Promise<Brand> {
-    const brand = await this.findOne(id);
-
-    if (updateBrandDto.slug && updateBrandDto.slug !== brand.slug) {
-      const existingBrand = await this.brandRepository.findOne({
-        slug: updateBrandDto.slug,
-      });
-
-      if (existingBrand) {
-        throw new ConflictException('Brand slug already exists');
-      }
-    }
-
-    if (updateBrandDto.name !== undefined) {
-      brand.name = updateBrandDto.name;
-    }
-
-    if (updateBrandDto.slug !== undefined) {
-      brand.slug = updateBrandDto.slug;
-    }
-
-    if (updateBrandDto.isActive !== undefined) {
-      brand.isActive = updateBrandDto.isActive;
-    }
-
-    await this.em.flush();
-
-    return brand;
-  }
-
-  async remove(id: string): Promise<{ message: string }> {
-    const brand = await this.findOne(id);
-
-    await this.em.remove(brand);
-
-    return {
-      message: 'Brand deleted successfully',
-    };
+    throw new InternalServerErrorException('Something went wrong');
   }
 }

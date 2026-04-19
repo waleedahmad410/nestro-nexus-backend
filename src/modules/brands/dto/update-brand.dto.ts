@@ -1,19 +1,7 @@
 // src/modules/brands/dto/update-brand.dto.ts
 
-import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
+import { PartialType } from '@nestjs/swagger';
 
-export class UpdateBrandDto {
-  @IsOptional()
-  @IsString()
-  @MaxLength(120)
-  name?: string;
+import { CreateBrandDto } from './create-brand.dto';
 
-  @IsOptional()
-  @IsString()
-  @MaxLength(160)
-  slug?: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-}
+export class UpdateBrandDto extends PartialType(CreateBrandDto) {}
