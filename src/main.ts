@@ -1,10 +1,14 @@
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { EnvironmentVariables } from './config/env.validation';
+import {
+  getCorsOptions,
+  setupSwagger,
+} from './config/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +16,13 @@ async function bootstrap() {
   const configService =
     app.get<ConfigService<EnvironmentVariables, true>>(ConfigService);
   const port = configService.getOrThrow<number>('APP_PORT');
+  const apiPrefix = configService.getOrThrow<string>('API_PREFIX');
+
+  const corsOptions = getCorsOptions(configService);
+
+  app.use(helmet());
+  app.enableCors(corsOptions);
+  app.setGlobalPrefix(apiPrefix);
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -21,15 +32,7 @@ async function bootstrap() {
     }),
   );
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Nestro Nexus API')
-    .setDescription('Backend API for Nestro Nexus')
-    .setVersion('1.0')
-    .build();
-
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-
-  SwaggerModule.setup('api/docs', app, document);
+  setupSwagger(app, apiPrefix);
 
   await app.listen(port);
 }

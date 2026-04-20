@@ -26,7 +26,7 @@ export class EnvironmentVariables {
   APP_NAME!: string;
 
   @IsInt()
-  @Min(0)
+  @Min(1)
   @Max(65535)
   APP_PORT!: number;
 
@@ -70,6 +70,11 @@ export class EnvironmentVariables {
   @IsString()
   @IsNotEmpty()
   JWT_REFRESH_EXPIRES_IN!: string;
+
+
+  @IsString()
+  @IsNotEmpty()
+  CORS_ORIGINS!: string;
 }
 
 export function validate(
@@ -78,24 +83,23 @@ export function validate(
   const validatedConfig = plainToInstance(
     EnvironmentVariables,
     {
-      NODE_ENV: config.NODE_ENV ?? Environment.Development,
+      NODE_ENV: config.NODE_ENV,
 
-      APP_NAME: config.APP_NAME ?? 'Nestro Nexus Backend',
-      APP_PORT: Number(config.APP_PORT ?? 3000),
-      API_PREFIX: config.API_PREFIX ?? 'api',
+      APP_NAME: config.APP_NAME,
+      APP_PORT: Number(config.APP_PORT),
+      API_PREFIX: config.API_PREFIX,
+      CORS_ORIGINS: config.CORS_ORIGINS,
 
-      DB_HOST: config.DB_HOST ?? 'localhost',
-      DB_PORT: Number(config.DB_PORT ?? 5432),
-      DB_USER: config.DB_USER ?? 'postgres',
-      DB_PASSWORD: config.DB_PASSWORD ?? 'postgres',
-      DB_NAME: config.DB_NAME ?? 'nestro_nexus',
+      DB_HOST: config.DB_HOST,
+      DB_PORT: Number(config.DB_PORT),
+      DB_USER: config.DB_USER,
+      DB_PASSWORD: config.DB_PASSWORD,
+      DB_NAME: config.DB_NAME,
 
-      JWT_ACCESS_SECRET:
-        config.JWT_ACCESS_SECRET ?? 'change_this_access_secret',
-      JWT_REFRESH_SECRET:
-        config.JWT_REFRESH_SECRET ?? 'change_this_refresh_secret',
-      JWT_ACCESS_EXPIRES_IN: config.JWT_ACCESS_EXPIRES_IN ?? '15m',
-      JWT_REFRESH_EXPIRES_IN: config.JWT_REFRESH_EXPIRES_IN ?? '7d',
+      JWT_ACCESS_SECRET: config.JWT_ACCESS_SECRET,
+      JWT_REFRESH_SECRET: config.JWT_REFRESH_SECRET,
+      JWT_ACCESS_EXPIRES_IN: config.JWT_ACCESS_EXPIRES_IN,
+      JWT_REFRESH_EXPIRES_IN: config.JWT_REFRESH_EXPIRES_IN,
     },
     {
       enableImplicitConversion: true,
