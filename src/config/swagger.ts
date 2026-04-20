@@ -4,7 +4,6 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { EnvironmentVariables } from './env.validation';
 
-
 export function parseCorsOrigins(corsOrigins: string): string[] {
   return corsOrigins
     .split(',')

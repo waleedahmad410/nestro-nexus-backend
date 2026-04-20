@@ -71,7 +71,6 @@ export class EnvironmentVariables {
   @IsNotEmpty()
   JWT_REFRESH_EXPIRES_IN!: string;
 
-
   @IsString()
   @IsNotEmpty()
   CORS_ORIGINS!: string;

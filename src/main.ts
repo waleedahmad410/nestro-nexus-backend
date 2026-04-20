@@ -5,10 +5,7 @@ import helmet from 'helmet';
 
 import { AppModule } from './app.module';
 import { EnvironmentVariables } from './config/env.validation';
-import {
-  getCorsOptions,
-  setupSwagger,
-} from './config/swagger';
+import { getCorsOptions, setupSwagger } from './config/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
