@@ -11,8 +11,6 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { v4 as uuid } from 'uuid';
 
-import { Branch } from '../../branches/entities/branch.entity';
-import { Brand } from '../../brands/entities/brand.entity';
 import { Role } from '../../roles/entities/role.entity';
 import { User } from './user.entity';
 
@@ -30,14 +28,6 @@ export class UserRoleAssignment {
   @Index()
   @ManyToOne(() => Role, { fieldName: 'role_id' })
   role!: Rel<Role>;
-
-  @Index()
-  @ManyToOne(() => Brand, { fieldName: 'brand_id' })
-  brand!: Rel<Brand>;
-
-  @Index()
-  @ManyToOne(() => Branch, { fieldName: 'branch_id' })
-  branch!: Rel<Branch>;
 
   @Index()
   @ManyToOne(() => User, { fieldName: 'assigned_by_user_id' })

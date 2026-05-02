@@ -11,7 +11,6 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { v4 as uuid } from 'uuid';
 
-import { Brand } from '../../brands/entities/brand.entity';
 
 export enum RoleStatus {
   ACTIVE = 'active',
@@ -24,10 +23,6 @@ export class Role {
 
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
-
-  @Index()
-  @ManyToOne(() => Brand, { fieldName: 'brand_id' })
-  brand!: Rel<Brand>;
 
   @Property({ type: 'string', length: 120 })
   name!: string;
