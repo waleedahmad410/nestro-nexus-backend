@@ -1,9 +1,29 @@
 // src/modules/modules.ts
 
 import { Module } from '@nestjs/common';
-import { BrandsModule } from './brands/brands.module';
+import { AuditLogsModule } from './audit-logs/audit-logs.module';
+import { AuthModule } from './auth/auth.module';
+import { BranchesModule } from './branches/branches.module';
+//import { BrandsModule } from './brands/brands.module';
+import { RolesModule } from './roles/roles.module';
+//import { StockLocationsModule } from './stock-locations/stock-locations.module';
+//import { UnitConversionsModule } from './unit-conversions/unit-conversions.module';
+//import { UnitsOfMeasureModule } from './units-of-measure/units-of-measure.module';
+import { UsersModule } from './users/users.module';
+import { SchoolsModule } from './schools/schools.module';
 
 @Module({
-  imports: [BrandsModule],
+  imports: [
+  //  BrandsModule,
+    BranchesModule,
+    RolesModule,
+    UsersModule,
+  //  StockLocationsModule,
+  //  UnitsOfMeasureModule,
+  //  UnitConversionsModule,
+    AuditLogsModule,
+    AuthModule,
+    SchoolsModule,
+  ],
 })
 export class Modules {}
