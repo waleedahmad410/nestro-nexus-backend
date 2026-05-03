@@ -1,4 +1,4 @@
-// src/modules/users/entities/user.entity.ts
+// src/modules/staff/entities/staff.entity.ts
 
 import { OptionalProps } from '@mikro-orm/core';
 import type { Rel } from '@mikro-orm/core';
@@ -13,18 +13,11 @@ import { v4 as uuid } from 'uuid';
 
 import { Branch } from '../../branches/entities/branch.entity';
 import { School } from '../../schools/entities/school.entity';
+import { User } from '../../users/entities/user.entity';
 
-@Entity({ tableName: 'users' })
-export class User {
-  [OptionalProps]?:
-    | 'id'
-    | 'isEmailVerified'
-    | 'isPhoneVerified'
-    | 'isActive'
-    | 'lastLoginAt'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'deletedAt';
+@Entity({ tableName: 'staff' })
+export class Staff {
+  [OptionalProps]?: 'id' | 'createdAt' | 'updatedAt' | 'deletedAt';
 
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
@@ -38,30 +31,28 @@ export class User {
   branch!: Rel<Branch>;
 
   @Index()
-  @Property({ type: 'string', length: 160 })
-  email!: string;
+  @ManyToOne(() => User, { fieldName: 'user_id' })
+  user!: Rel<User>;
 
-  @Property({ type: 'string', length: 40, nullable: true })
-  phone?: string;
+  @Index()
+  @Property({ type: 'string', length: 50 })
+  employeeNumber!: string;
 
-  @Property({ type: 'string', length: 255 })
-  passwordHash!: string;
+  @Property({ type: 'string', length: 100, nullable: true })
+  department?: string;
+
+  @Property({ type: 'string', length: 100, nullable: true })
+  designation?: string;
+
+  @Property({ type: 'string', length: 50 })
+  employmentType!: string;
+
+  @Property({ type: 'Date' })
+  joiningDate!: Date;
 
   @Index()
   @Property({ type: 'string', length: 30 })
-  userType!: string;
-
-  @Property({ type: 'boolean', default: false })
-  isEmailVerified = false;
-
-  @Property({ type: 'boolean', default: false })
-  isPhoneVerified = false;
-
-  @Property({ type: 'boolean', default: true })
-  isActive = true;
-
-  @Property({ type: 'Date', nullable: true })
-  lastLoginAt?: Date;
+  status!: string;
 
   @Property({ type: 'Date', onCreate: () => new Date() })
   createdAt = new Date();

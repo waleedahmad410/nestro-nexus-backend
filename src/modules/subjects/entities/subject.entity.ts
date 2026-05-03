@@ -1,4 +1,4 @@
-// src/modules/roles/entities/role.entity.ts
+// src/modules/subjects/entities/subject.entity.ts
 
 import { OptionalProps } from '@mikro-orm/core';
 import type { Rel } from '@mikro-orm/core';
@@ -13,15 +13,9 @@ import { v4 as uuid } from 'uuid';
 
 import { School } from '../../schools/entities/school.entity';
 
-@Entity({ tableName: 'roles' })
-export class Role {
-  [OptionalProps]?:
-    | 'id'
-    | 'isSystemRole'
-    | 'isActive'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'deletedAt';
+@Entity({ tableName: 'subjects' })
+export class Subject {
+  [OptionalProps]?: 'id' | 'isActive' | 'createdAt' | 'updatedAt' | 'deletedAt';
 
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
@@ -37,15 +31,12 @@ export class Role {
   @Property({ type: 'string', length: 50 })
   code!: string;
 
-  @Index()
-  @Property({ type: 'string', length: 50 })
-  roleType!: string;
-
   @Property({ type: 'string', length: 255, nullable: true })
   description?: string;
 
-  @Property({ type: 'boolean', default: false })
-  isSystemRole = false;
+  @Index()
+  @Property({ type: 'string', length: 50 })
+  subjectType!: string;
 
   @Property({ type: 'boolean', default: true })
   isActive = true;

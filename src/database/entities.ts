@@ -1,23 +1,51 @@
-
+import { AcademicYear } from '../modules/academic-years/entities/academic-year.entity';
 import { Branch } from '../modules/branches/entities/branch.entity';
-import { Role } from '../modules/roles/entities/role.entity';
 import { AuditLog } from '../modules/audit-logs/entities/audit-log.entity';
-import { UserSession } from '../modules/auth/entities/user-session.entity';
+import { PasswordResetToken } from '../modules/auth/entities/password-reset-token.entity';
+import { Session } from '../modules/auth/entities/session.entity';
+import { SchoolClass } from '../modules/classes/entities/school-class.entity';
+import { Guardian } from '../modules/guardians/entities/guardian.entity';
+import { StudentGuardian } from '../modules/guardians/entities/student-guardian.entity';
+import { Permission } from '../modules/roles/entities/permission.entity';
+import { RolePermission } from '../modules/roles/entities/role-permission.entity';
+import { Role } from '../modules/roles/entities/role.entity';
+import { SchoolSetting } from '../modules/schools/entities/school-setting.entity';
+import { School } from '../modules/schools/entities/school.entity';
+import { Section } from '../modules/sections/entities/section.entity';
+import { Staff } from '../modules/staff/entities/staff.entity';
+import { StudentEnrollment } from '../modules/students/entities/student-enrollment.entity';
+import { Student } from '../modules/students/entities/student.entity';
+import { ClassSubject } from '../modules/subjects/entities/class-subject.entity';
+import { Subject } from '../modules/subjects/entities/subject.entity';
+import { TeacherSubject } from '../modules/teachers/entities/teacher-subject.entity';
+import { Teacher } from '../modules/teachers/entities/teacher.entity';
+import { UserProfile } from '../modules/users/entities/user-profile.entity';
 import { UserRoleAssignment } from '../modules/users/entities/user-role-assignment.entity';
 import { User } from '../modules/users/entities/user.entity';
-import { School } from '../modules/schools/entities/school.entity';
-import { SchoolSetting } from '../modules/schools/entities/school-setting.entity';
 
 export const entities = [
-  Branch,
-  Role,
-  User,
-  UserRoleAssignment,
+  AcademicYear,
   AuditLog,
-  UserSession,
-  School,  AuditLog,
-  UserSession,
+  Branch,
+  ClassSubject,
+  Guardian,
+  PasswordResetToken,
+  Permission,
+  Role,
+  RolePermission,
+  SchoolClass,
+  Session,
   School,
-
   SchoolSetting,
+  Section,
+  Staff,
+  Student,
+  StudentEnrollment,
+  StudentGuardian,
+  Subject,
+  Teacher,
+  TeacherSubject,
+  User,
+  UserProfile,
+  UserRoleAssignment,
 ];

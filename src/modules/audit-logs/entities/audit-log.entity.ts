@@ -11,6 +11,8 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { v4 as uuid } from 'uuid';
 
+import { Branch } from '../../branches/entities/branch.entity';
+import { School } from '../../schools/entities/school.entity';
 import { User } from '../../users/entities/user.entity';
 
 @Entity({ tableName: 'audit_logs' })
@@ -21,20 +23,31 @@ export class AuditLog {
   id: string = uuid();
 
   @Index()
-  @ManyToOne(() => User, { fieldName: 'actor_user_id' })
-  actorUser!: Rel<User>;
+  @ManyToOne(() => School, { fieldName: 'school_id' })
+  school!: Rel<School>;
+
+  @Index()
+  @ManyToOne(() => Branch, { fieldName: 'branch_id' })
+  branch!: Rel<Branch>;
+
+  @Index()
+  @ManyToOne(() => User, { fieldName: 'user_id' })
+  user!: Rel<User>;
+
+  @Property({ type: 'string', length: 120 })
+  moduleName!: string;
+
+  @Index()
+  @Property({ type: 'string', length: 120 })
+  tableName!: string;
+
+  @Index()
+  @Property({ type: 'uuid' })
+  recordId!: string;
 
   @Index()
   @Property({ type: 'string', length: 80 })
   action!: string;
-
-  @Index()
-  @Property({ type: 'string', length: 120 })
-  entityName!: string;
-
-  @Index()
-  @Property({ type: 'uuid' })
-  entityId!: string;
 
   @Property({ type: 'jsonb', nullable: true })
   oldValues?: Record<string, unknown>;
