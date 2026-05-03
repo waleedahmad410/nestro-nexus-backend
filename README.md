@@ -1,98 +1,185 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Restro Nexus Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Backend API for Restro Nexus, built with NestJS, MikroORM, and PostgreSQL.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+The project currently provides application bootstrap, environment validation,
+Swagger setup, MikroORM entity registration, migrations, a health endpoint, and
+the first domain modules for brand, branch, user, auth, stock, unit, and audit
+data.
 
-## Description
+## Stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Node.js with NestJS 11
+- PostgreSQL
+- MikroORM 7 with migrations
+- Swagger/OpenAPI
+- `class-validator` and `class-transformer`
+- Helmet and configurable CORS
+- Jest, ESLint, and Prettier
 
-## Project setup
+## Project Structure
 
-```bash
-$ pnpm install
+```text
+src/
+  app.module.ts                 Root Nest module
+  main.ts                       App bootstrap, global prefix, CORS, Swagger
+  config/
+    env.validation.ts           Required environment variables
+    mikro-orm.config.ts         Runtime MikroORM config
+    swagger.ts                  Swagger and CORS helpers
+  database/
+    entities.ts                 Central MikroORM entity registry
+    migrations/                 MikroORM migrations
+  modules/
+    brands/                     Brand CRUD module
+    branches/                   Branch schema module
+    roles/                      Role schema module
+    users/                      User and user role assignment schema module
+    auth/                       User session schema module
+    stock-locations/            Stock location schema module
+    units-of-measure/           Unit of measure schema module
+    unit-conversions/           Unit conversion schema module
+    audit-logs/                 Audit log schema module
 ```
 
-## Compile and run the project
+## Domain Tables
+
+The current entity registry includes:
+
+- `brands`
+- `branches`
+- `roles`
+- `users`
+- `user_role_assignments`
+- `user_sessions`
+- `stock_locations`
+- `units_of_measure`
+- `unit_conversions`
+- `audit_logs`
+
+Most modules currently register entities and database schema only. The `brands`
+module includes controller/service/DTO files for CRUD behavior. The health
+endpoint is available at `/{API_PREFIX}/health`.
+
+## Environment Variables
+
+Create a `.env` file in the project root with these keys:
+
+```env
+NODE_ENV=development
+APP_NAME="Restro Nexus"
+APP_PORT=3000
+API_PREFIX=api
+CORS_ORIGINS=http://localhost:3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_NAME=restro_nexus
+
+JWT_ACCESS_SECRET=change-me
+JWT_REFRESH_SECRET=change-me
+JWT_ACCESS_EXPIRES_IN=15m
+JWT_REFRESH_EXPIRES_IN=7d
+```
+
+`CORS_ORIGINS` accepts a comma-separated list. Use `*` only for local or
+temporary development cases where credentialed requests are not required.
+
+## Installation
+
+```bash
+pnpm install
+```
+
+## Database
+
+MikroORM is configured for PostgreSQL and reads entities from
+`src/database/entities.ts`.
+
+Run pending migrations:
+
+```bash
+npx mikro-orm migration:up
+```
+
+Create a new migration after changing entities:
+
+```bash
+npx mikro-orm migration:create
+```
+
+Migration files are stored in `src/database/migrations` during development and
+compiled to `dist/database/migrations` for production builds.
+
+## Running The App
 
 ```bash
 # development
-$ pnpm run start
+pnpm run start
 
 # watch mode
-$ pnpm run start:dev
+pnpm run start:dev
 
-# production mode
-$ pnpm run start:prod
+# production build
+pnpm run build
+pnpm run start:prod
 ```
 
-## Run tests
+Swagger is available at:
+
+```text
+/{API_PREFIX}/docs
+```
+
+For example, if `API_PREFIX=api` and `APP_PORT=3000`:
+
+```text
+http://localhost:3000/api/docs
+```
+
+Health check:
+
+```text
+GET /{API_PREFIX}/health
+```
+
+## Quality Commands
 
 ```bash
+# compile TypeScript
+pnpm run build
+
+# lint
+pnpm run lint
+
+# auto-fix lint issues
+pnpm run lint:fix
+
+# format source and tests
+pnpm run format
+
 # unit tests
-$ pnpm run test
+pnpm run test
 
 # e2e tests
-$ pnpm run test:e2e
+pnpm run test:e2e
 
 # test coverage
-$ pnpm run test:cov
+pnpm run test:cov
 ```
 
-## Deployment
+## Development Notes
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+- Entity properties use camelCase in TypeScript and map to snake_case columns in
+  PostgreSQL through MikroORM naming behavior or explicit `fieldName` settings.
+- Feature modules should register their entities with `MikroOrmModule.forFeature`
+  and add the entity class to `src/database/entities.ts`.
+- Add a migration whenever entity metadata changes.
+- Keep table creation order aligned with foreign key dependencies. Current
+  migrations create base tables before dependent tables.
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+This project is private and currently marked `UNLICENSED` in `package.json`.

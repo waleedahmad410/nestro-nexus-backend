@@ -14,9 +14,14 @@ describe('AppController', () => {
     appController = app.get<AppController>(AppController);
   });
 
-  describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+  describe('health', () => {
+    it('should return the service health status', () => {
+      const response = appController.getHealth();
+
+      expect(response.status).toBe('ok');
+      expect(response.uptime).toEqual(expect.any(Number));
+      expect(response.timestamp).toEqual(expect.any(String));
+      expect(Number.isNaN(Date.parse(response.timestamp))).toBe(false);
     });
   });
 });
