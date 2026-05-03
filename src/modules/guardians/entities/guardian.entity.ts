@@ -1,4 +1,4 @@
-// src/modules/branches/entities/branch.entity.ts
+// src/modules/guardians/entities/guardian.entity.ts
 
 import { OptionalProps } from '@mikro-orm/core';
 import type { Rel } from '@mikro-orm/core';
@@ -12,16 +12,11 @@ import {
 import { v4 as uuid } from 'uuid';
 
 import { School } from '../../schools/entities/school.entity';
+import { User } from '../../users/entities/user.entity';
 
-@Entity({ tableName: 'branches' })
-export class Branch {
-  [OptionalProps]?:
-    | 'id'
-    | 'isMainBranch'
-    | 'isActive'
-    | 'createdAt'
-    | 'updatedAt'
-    | 'deletedAt';
+@Entity({ tableName: 'guardians' })
+export class Guardian {
+  [OptionalProps]?: 'id' | 'isActive' | 'createdAt' | 'updatedAt' | 'deletedAt';
 
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
@@ -30,19 +25,22 @@ export class Branch {
   @ManyToOne(() => School, { fieldName: 'school_id' })
   school!: Rel<School>;
 
-  @Property({ type: 'string', length: 255 })
-  name!: string;
+  @Index()
+  @ManyToOne(() => User, { fieldName: 'user_id' })
+  user!: Rel<User>;
 
   @Index()
   @Property({ type: 'string', length: 50 })
-  code!: string;
+  relationType!: string;
 
-  @Index()
-  @Property({ type: 'string', length: 160 })
-  email!: string;
+  @Property({ type: 'string', length: 120, nullable: true })
+  occupation?: string;
 
   @Property({ type: 'string', length: 40, nullable: true })
   phone?: string;
+
+  @Property({ type: 'string', length: 160, nullable: true })
+  email?: string;
 
   @Property({ type: 'text', nullable: true })
   address?: string;
@@ -55,12 +53,6 @@ export class Branch {
 
   @Property({ type: 'string', length: 100, nullable: true })
   country?: string;
-
-  @Property({ type: 'string', length: 20, nullable: true })
-  postalCode?: string;
-
-  @Property({ type: 'boolean', default: false })
-  isMainBranch = false;
 
   @Property({ type: 'boolean', default: true })
   isActive = true;

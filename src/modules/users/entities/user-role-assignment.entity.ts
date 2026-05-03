@@ -11,7 +11,9 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { v4 as uuid } from 'uuid';
 
+import { Branch } from '../../branches/entities/branch.entity';
 import { Role } from '../../roles/entities/role.entity';
+import { School } from '../../schools/entities/school.entity';
 import { User } from './user.entity';
 
 @Entity({ tableName: 'user_role_assignments' })
@@ -30,8 +32,12 @@ export class UserRoleAssignment {
   role!: Rel<Role>;
 
   @Index()
-  @ManyToOne(() => User, { fieldName: 'assigned_by_user_id' })
-  assignedByUser!: Rel<User>;
+  @ManyToOne(() => School, { fieldName: 'school_id' })
+  school!: Rel<School>;
+
+  @Index()
+  @ManyToOne(() => Branch, { fieldName: 'branch_id' })
+  branch!: Rel<Branch>;
 
   @Property({ type: 'Date', onCreate: () => new Date() })
   createdAt = new Date();

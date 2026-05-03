@@ -1,4 +1,4 @@
-// src/modules/users/entities/user.entity.ts
+// src/modules/subjects/entities/class-subject.entity.ts
 
 import { OptionalProps } from '@mikro-orm/core';
 import type { Rel } from '@mikro-orm/core';
@@ -11,20 +11,20 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { v4 as uuid } from 'uuid';
 
+import { AcademicYear } from '../../academic-years/entities/academic-year.entity';
 import { Branch } from '../../branches/entities/branch.entity';
+import { SchoolClass } from '../../classes/entities/school-class.entity';
 import { School } from '../../schools/entities/school.entity';
+import { Subject } from './subject.entity';
 
-@Entity({ tableName: 'users' })
-export class User {
+@Entity({ tableName: 'class_subjects' })
+export class ClassSubject {
   [OptionalProps]?:
     | 'id'
-    | 'isEmailVerified'
-    | 'isPhoneVerified'
-    | 'isActive'
-    | 'lastLoginAt'
+    | 'isCompulsory'
+    | 'sortOrder'
     | 'createdAt'
-    | 'updatedAt'
-    | 'deletedAt';
+    | 'updatedAt';
 
   @PrimaryKey({ type: 'uuid' })
   id: string = uuid();
@@ -38,30 +38,22 @@ export class User {
   branch!: Rel<Branch>;
 
   @Index()
-  @Property({ type: 'string', length: 160 })
-  email!: string;
-
-  @Property({ type: 'string', length: 40, nullable: true })
-  phone?: string;
-
-  @Property({ type: 'string', length: 255 })
-  passwordHash!: string;
+  @ManyToOne(() => AcademicYear, { fieldName: 'academic_year_id' })
+  academicYear!: Rel<AcademicYear>;
 
   @Index()
-  @Property({ type: 'string', length: 30 })
-  userType!: string;
+  @ManyToOne(() => SchoolClass, { fieldName: 'class_id' })
+  schoolClass!: Rel<SchoolClass>;
 
-  @Property({ type: 'boolean', default: false })
-  isEmailVerified = false;
-
-  @Property({ type: 'boolean', default: false })
-  isPhoneVerified = false;
+  @Index()
+  @ManyToOne(() => Subject, { fieldName: 'subject_id' })
+  subject!: Rel<Subject>;
 
   @Property({ type: 'boolean', default: true })
-  isActive = true;
+  isCompulsory = true;
 
-  @Property({ type: 'Date', nullable: true })
-  lastLoginAt?: Date;
+  @Property({ type: 'integer', default: 0 })
+  sortOrder = 0;
 
   @Property({ type: 'Date', onCreate: () => new Date() })
   createdAt = new Date();
@@ -72,7 +64,4 @@ export class User {
     onUpdate: () => new Date(),
   })
   updatedAt = new Date();
-
-  @Property({ type: 'Date', nullable: true })
-  deletedAt?: Date;
 }

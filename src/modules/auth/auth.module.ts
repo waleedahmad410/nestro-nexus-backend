@@ -3,10 +3,11 @@
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 
-import { UserSession } from './entities/user-session.entity';
+import { PasswordResetToken } from './entities/password-reset-token.entity';
+import { Session } from './entities/session.entity';
 
 @Module({
-  imports: [MikroOrmModule.forFeature([UserSession])],
+  imports: [MikroOrmModule.forFeature([PasswordResetToken, Session])],
   exports: [MikroOrmModule],
 })
 export class AuthModule {}
